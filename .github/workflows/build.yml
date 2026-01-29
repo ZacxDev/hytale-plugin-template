@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  push:
+    branches: [main, trunk]
+  pull_request:
+    branches: [main, trunk]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Setup Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Build Plugin
+        run: nix develop --command gradle shadowJar
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-jar
+          path: build/libs/*.jar
+          retention-days: 30

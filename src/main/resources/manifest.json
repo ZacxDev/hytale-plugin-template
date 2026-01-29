@@ -1,0 +1,20 @@
+{
+  "Group": "com.example.hytale",
+  "Name": "ExampleMod",
+  "Version": "0.1.0",
+  "Description": "An example Hytale plugin with a greeting command and join listener",
+  "Authors": [
+    { "Name": "Example", "Email": "", "Url": "" }
+  ],
+  "Website": "",
+  "Main": "com.example.hytale.ExamplePlugin",
+  "Dependencies": {
+    "Hytale:EntityModule": "*",
+    "Hytale:BlockModule": "*"
+  },
+  "OptionalDependencies": {},
+  "LoadBefore": {},
+  "DisabledByDefault": false,
+  "IncludesAssetPack": true,
+  "SubPlugins": []
+}

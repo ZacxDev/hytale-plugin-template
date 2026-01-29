@@ -1,0 +1,14 @@
+{
+  "TranslationProperties": {
+    "Name": "Greeting Scroll",
+    "Description": "A magical scroll that greets everyone nearby"
+  },
+  "Id": "Greeting_Scroll",
+  "Icon": "Icons/ItemsGenerated/Greeting_Scroll.png",
+  "Model": "Items/Greeting_Scroll/Greeting_Scroll.blockymodel",
+  "Texture": "Items/Greeting_Scroll/Greeting_Scroll_Texture.png",
+  "PlayerAnimationsId": "Item",
+  "Quality": "Uncommon",
+  "MaxStack": 16,
+  "Categories": ["Items.Example"]
+}
