@@ -2,7 +2,7 @@
 
 A starter template for building Hytale server plugins. Demonstrates commands, events, and custom items with bundled assets.
 
-[![Build](https://github.com/YOUR_USERNAME/hytale-plugin-template/actions/workflows/build.yml/badge.svg)](https://github.com/YOUR_USERNAME/hytale-plugin-template/actions/workflows/build.yml)
+[![Build](https://github.com/ZacxDev/hytale-plugin-template/actions/workflows/build.yml/badge.svg)](https://github.com/ZacxDev/hytale-plugin-template/actions/workflows/build.yml)
 
 ## Features
 
