@@ -6,10 +6,90 @@ A starter template for building Hytale server plugins. Demonstrates commands, ev
 
 ## Features
 
-- `/hello [name]` - Sends a greeting message
-- `/givescroll` - Shows how to spawn the custom item
+- `/hello [name]` - Sends a greeting message (public command, no permission required)
+- `/givescroll` - Spawns the custom Greeting Scroll item
 - **Greeting Scroll** - Custom item with icon, texture, and model (bundled asset pack)
-- **Player join welcome** - Event listener that greets connecting players
+- **Player join welcome** - Unkeyed event example (`PlayerConnectEvent`)
+- **Chat listener** - Keyed event example (`PlayerChatEvent` with `registerGlobal()`)
+
+## Common Gotchas
+
+These are the most common mistakes when developing Hytale plugins:
+
+### Event Registration: Keyed vs Unkeyed
+
+Events in Hytale are either **keyed** or **unkeyed**. Using the wrong registration method causes **compile-time errors**.
+
+| Event Type | Interface | Registration Method |
+|------------|-----------|---------------------|
+| Unkeyed | `IBaseEvent<Void>` | `register(Class, Consumer)` |
+| Keyed | `IBaseEvent<K>` / `IAsyncEvent<K>` | `registerGlobal(Class, Consumer)` |
+
+```java
+// CORRECT: PlayerConnectEvent is unkeyed (IBaseEvent<Void>)
+getEventRegistry().register(PlayerConnectEvent.class, event -> { ... });
+
+// CORRECT: PlayerChatEvent is keyed (IAsyncEvent<String>)
+getEventRegistry().registerGlobal(PlayerChatEvent.class, event -> { ... });
+
+// WRONG: This won't compile!
+// getEventRegistry().register(PlayerChatEvent.class, event -> { ... });
+// Error: incompatible upper bounds PlayerChatEvent, IBaseEvent<Void>
+```
+
+See `ChatListener.java` for a complete keyed event example.
+
+### PNG Textures Must Be 8-bit RGBA
+
+All PNG textures **must be 8-bit/channel RGBA**. 16-bit PNGs will crash the client with "Failed to load CustomUI documents".
+
+```bash
+# Validate all textures in your project
+./scripts/validate-textures.sh
+
+# Convert a 16-bit PNG to 8-bit
+magick input.png -depth 8 -type TrueColorAlpha PNG32:output.png
+
+# Verify format
+file texture.png  # Should show "8-bit/color RGBA"
+```
+
+### Logging Uses Flogger, Not SLF4J
+
+Hytale uses Google Flogger. The standard `logger.info()` methods don't exist.
+
+```java
+// CORRECT
+getLogger().atInfo().log("Player %s joined", username);
+getLogger().atWarning().log("Something went wrong");
+
+// WRONG - these methods don't exist
+// getLogger().info("message");
+// getLogger().warn("message");
+```
+
+### Item Definitions Go in Server/, Not Common/
+
+Asset packs have two roots with distinct purposes:
+
+| Directory | Purpose | Example |
+|-----------|---------|---------|
+| `Server/` | Data definitions | `Server/Item/Items/My_Item.json` |
+| `Common/` | Visual assets | `Common/Icons/ItemsGenerated/My_Item.png` |
+
+**Wrong**: `Common/Assets/Items/My_Item.json`
+**Right**: `Server/Item/Items/My_Item.json`
+
+### Command Permissions
+
+Commands auto-generate a permission node by default. Players without that permission see "you do not have permission." To make a command public:
+
+```java
+@Override
+protected boolean canGeneratePermission() {
+    return false;  // Any player can use this command
+}
+```
 
 ## Quick Start
 
@@ -102,9 +182,11 @@ hytale-plugin-template/
 ├── src/main/
 │   ├── java/com/example/hytale/
 │   │   ├── ExamplePlugin.java          # Main plugin entry point
-│   │   └── commands/
-│   │       ├── HelloCommand.java       # /hello command
-│   │       └── GiveScrollCommand.java  # /givescroll command
+│   │   ├── commands/
+│   │   │   ├── HelloCommand.java       # /hello command (public)
+│   │   │   └── GiveScrollCommand.java  # /givescroll command
+│   │   └── listener/
+│   │       └── ChatListener.java       # Keyed event example
 │   └── resources/
 │       ├── manifest.json               # Plugin manifest
 │       ├── Server/Item/Items/          # Item definitions (data)
@@ -115,6 +197,8 @@ hytale-plugin-template/
 │           └── Items/Greeting_Scroll/
 │               ├── Greeting_Scroll.blockymodel
 │               └── Greeting_Scroll_Texture.png
+├── scripts/
+│   └── validate-textures.sh            # PNG format validator
 ├── flake.nix                           # Nix dev environment
 ├── build.gradle                        # Gradle build config
 └── settings.gradle
